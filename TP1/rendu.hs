@@ -35,18 +35,18 @@ mymap t [] = []
 -- ex : x 2 -> 3 (avec l = [1,2,3])
 
 --Q8
-mylength (x:xs) = mylength(xs) +1
-mylength [] = 0
---Q8 sur le terminal :
+mylength xs = sum (map variable xs)
+variable _ = 1
+--Q8 sur le terminal (solution peut être fausse):
 -- let r = mymap somme [[1,2],[3,4]]
 -- r :: [Integer]
 -- mylength r
 -- 2 
 --Q9
-myfunction t x n = if n < 0 then
-			-1
-		else
-		 llll
+--myfunction t x n = if n < 0 then
+--			-1
+--		else
+--		 llll
 
   
   
