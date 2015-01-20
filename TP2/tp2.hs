@@ -34,3 +34,10 @@ main = animate (InWindow "Dragon" (500, 500) (0, 0)) white (dragonAnime (50,250)
 dragonAnime a b t = Line (dragon a b !! (round t `mod` 20))
 
 dragon x y = iterate pasDragon [x,y]
+
+dragonOrdre :: Point -> Point -> Int -> Path
+
+dragonOrdre p1 p2  0 	= [p1,p2]
+dragonOrdre p1 p2 n	= let c = (pointAintercaler p1 p2)
+                          in (dragonOrdre p1 c (n-1))++(dragonOrdre p2 c (n-1))
+
