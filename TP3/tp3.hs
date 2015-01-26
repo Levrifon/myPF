@@ -61,8 +61,16 @@ filtreSymbolesTortue :: Config -> Mot -> Mot
 filtreSymbolesTortue c mot = [s | s <- mot, s `elem` (symbolesTortue c) ]
 --Question 8
 interpreteSymbole :: Config -> EtatDessin -> Symbole -> EtatDessin
-interpreteSymbole c (etatortue,path) '+' = tourneAGauche c etattotue
-interpreteSymbole c (etatortue,path) '-'
+interpreteSymbole c (etatortue,path) '+' = (tourneAGauche c etatortue,path)
+interpreteSymbole c (etatortue,path) '-' = (tourneADroite c etatortue,path)
+interpreteSymbole c (etatortue,path) 'F' = (avance c etatortue,path)
+--Question 9
+--interpreteMot :: Config -> Mot -> Picture
+--interpreteMot cfg (c:m) = line (cfg)
+--dessin = interpreteMot (((-150,0),0),100,1,pi/3,"F+-") "F+F--F+F"
+
+main = display (InWindow "L-système" (1000, 1000) (0, 0)) white dessin
+--enieme = round instant `mod` 10
 
  
 
