@@ -63,14 +63,60 @@ filtreSymbolesTortue c mot = [s | s <- mot, s `elem` (symbolesTortue c) ]
 interpreteSymbole :: Config -> EtatDessin -> Symbole -> EtatDessin
 interpreteSymbole c (etatortue,path) '+' = (tourneAGauche c etatortue,path)
 interpreteSymbole c (etatortue,path) '-' = (tourneADroite c etatortue,path)
-interpreteSymbole c (etatortue,path) 'F' = (avance c etatortue,path)
+interpreteSymbole c (etatortue,path) 'F' = ((avance c etatortue), getPointFromEtatTortue etatortue : getPointFromEtatTortue(avance c etatortue):[])
+
+getPointFromEtatTortue :: EtatTortue -> Point
+getPointFromEtatTortue (p,_) = p
 --Question 9
---interpreteMot :: Config -> Mot -> Picture
---interpreteMot cfg (c:m) = line (cfg)
---dessin = interpreteMot (((-150,0),0),100,1,pi/3,"F+-") "F+F--F+F"
+interpreteMot :: Config -> Mot -> Picture
+--interpreteMot prend en parametre une config et un mot
+interpreteMot cfg mot = line (interpreteMot' cfg mot ((etatInitial cfg,[])))
 
-main = display (InWindow "L-système" (1000, 1000) (0, 0)) white dessin
+interpreteMot' :: Config -> Mot -> EtatDessin -> Path
+interpreteMot' cfg [] (ett,pth) = pth
+--j'interpreteMot sur l'ensemble des symboles : donc je concatene le path avec l'interpretation du prochain Symbole "tourne a droite" (par exemple) qui mettra à jour la tortue et son path.
+interpreteMot' cfg (carac:mot) (ett,pth) = pth ++ (interpreteMot' cfg mot (interpreteSymbole cfg (ett,pth) carac))
+--(ett,pth) correspond a l'etat du Dessin (etatortue,path)
+
+dessin = interpreteMot (((-150,0),0),100,1,pi/3,"F+-") "F+F--F+F+"
+
+main = animate(InWindow "L-systeme" (1000, 1000) (0, 0)) white vonKoch1Anime
 --enieme = round instant `mod` 10
+--Question 10 
+lsystemeAnime :: LSysteme -> Config -> Float -> Picture
+lsystemeAnime lsys cfg t = interpreteMot cfg (lsys !! (round t `mod` 10))
 
- 
 
+vonKoch1 :: LSysteme
+vonKoch1 = lsysteme "F" regles
+    where regles 'F' = "F-F++F-F"
+          regles  s  = [s]
+
+vonKoch2 :: LSysteme
+vonKoch2 = lsysteme "F++F++F++" regles
+    where regles 'F' = "F-F++F-F"
+          regles  s  = [s]
+
+hilbert :: LSysteme
+hilbert = lsysteme "X" regles
+    where regles 'X' = "+YF-XFX-FY+"
+          regles 'Y' = "-XF+YFY+FX-"
+          regles  s  = [s]
+
+dragon :: LSysteme
+dragon = lsysteme "FX" regles
+    where regles 'X' = "X+YF+"
+          regles 'Y' = "-FX-Y"
+          regles  s  = [s]
+
+vonKoch1Anime :: Float -> Picture
+vonKoch1Anime = lsystemeAnime vonKoch1 (((-400, 0), 0), 800, 1/3, pi/3, "F+-")
+
+vonKoch2Anime :: Float -> Picture
+vonKoch2Anime = lsystemeAnime vonKoch2 (((-400, -250), 0), 800, 1/3, pi/3, "F+-")
+
+hilbertAnime :: Float -> Picture
+hilbertAnime = lsystemeAnime hilbert (((-400, -400), 0), 800, 1/2, pi/2, "F+-")
+
+dragonAnime :: Float -> Picture
+dragonAnime = lsystemeAnime dragon (((0, 0), 0), 50, 1, pi/2, "F+-")
