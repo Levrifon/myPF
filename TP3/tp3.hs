@@ -46,6 +46,9 @@ facteurEchelle (_,_,echelle,_,_) = echelle
 angle :: Config -> Float
 angle (_,_,_,angle,_) = angle
 
+getActualEtatDessin :: EtatDessin -> (EtatTortue,Path)
+getActualEtatDessin (e:ets , p:pths) = (e,p)
+
 symbolesTortue :: Config -> [Symbole]
 symbolesTortue (_,_,_,_,symbtort) = symbtort
 --Question 5
@@ -67,6 +70,7 @@ interpreteSymbole c (etatortue,path) 'F' = (([avance c etatortue]), getPointFrom
 
 getPointFromEtatTortue :: EtatTortue -> Point
 getPointFromEtatTortue (p,_) = p
+
 --Question 9
 interpreteMot :: Config -> Mot -> Picture
 --interpreteMot prend en parametre une config et un mot
@@ -81,7 +85,6 @@ interpreteMot' cfg (carac:mot) (ett,pth) = pth ++ (interpreteMot' cfg mot (inter
 dessin = interpreteMot (((-150,0),0),100,1,pi/3,"F+-") "F+F--F+F+"
 
 main = animate(InWindow "L-systeme" (1000, 1000) (0, 0)) white vonKoch1Anime
---enieme = round instant `mod` 10
 --Question 10 
 lsystemeAnime :: LSysteme -> Config -> Float -> Picture
 lsystemeAnime lsys cfg t = interpreteMot cfg (lsys !! (round t `mod` 10))
@@ -120,3 +123,5 @@ hilbertAnime = lsystemeAnime hilbert (((-400, -400), 0), 800, 1/2, pi/2, "F+-")
 
 dragonAnime :: Float -> Picture
 dragonAnime = lsystemeAnime dragon (((0, 0), 0), 50, 1, pi/2, "F+-")
+
+
