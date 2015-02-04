@@ -5,7 +5,7 @@ type Axiome  	= Mot
 type Regles   	= Symbole -> Mot
 type LSysteme 	= [Mot]
 type EtatTortue = (Point, Float)
-type EtatDessin = (EtatTortue, Path)
+type EtatDessin = ([EtatTortue], [Path])
 motSuivant :: Regles -> Mot -> Mot
 --Question 1 : Recursive
 motSuivant reg [] 		= []
@@ -61,9 +61,9 @@ filtreSymbolesTortue :: Config -> Mot -> Mot
 filtreSymbolesTortue c mot = [s | s <- mot, s `elem` (symbolesTortue c) ]
 --Question 8
 interpreteSymbole :: Config -> EtatDessin -> Symbole -> EtatDessin
-interpreteSymbole c (etatortue,path) '+' = (tourneAGauche c etatortue,path)
-interpreteSymbole c (etatortue,path) '-' = (tourneADroite c etatortue,path)
-interpreteSymbole c (etatortue,path) 'F' = ((avance c etatortue), getPointFromEtatTortue etatortue : getPointFromEtatTortue(avance c etatortue):[])
+interpreteSymbole c (e:etatortue,p:path) '+' = (tourneAGauche c e,p)
+interpreteSymbole c (e:etatortue,p:path) '-' = ([tourneADroite c e],[p])
+interpreteSymbole c (etatortue,path) 'F' = (([avance c etatortue]), getPointFromEtatTortue etatortue : getPointFromEtatTortue([avance c etatortue]):[])
 
 getPointFromEtatTortue :: EtatTortue -> Point
 getPointFromEtatTortue (p,_) = p
