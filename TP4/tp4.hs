@@ -6,8 +6,7 @@ import Test.QuickCheck
 data Arbre coul val = 	Feuille | 
 			Noeud coul val (Arbre coul val) (Arbre coul val) deriving Show
 --Exemple d'arbres
-a = Noeud 'B' 1 (Noeud 'N' 2 (Feuille) (
-				Noeud 'B' 5 (Feuille) (Feuille))
+a = Noeud 'B' 1 (Noeud 'N' 2 (Feuille) (Noeud 'B' 5 (Feuille) (Feuille))
 		) 
 		(Noeud 'B' 3 (
 				Noeud 'N' 4 (Feuille) (Feuille)
@@ -15,7 +14,16 @@ a = Noeud 'B' 1 (Noeud 'N' 2 (Feuille) (
 			(Feuille)
 		)
 
+--arbre complet numero 1
+acomplet = Noeud 'B' 1 (Noeud 'N' 2 (Feuille) (Feuille)) (Noeud 'B' 3 (Feuille) (Feuille))
+
+--arbre complet numero 2
+acomplet2 = Noeud 'B' 1 (Noeud 'N' 2 (Noeud 'B' 3 (Feuille) (Feuille)) (Noeud 'B' 4 (Feuille) (Feuille))) (Noeud 'B' 3 (Noeud 'N' 5 (Feuille) (Feuille)) (Noeud 'B' 6 (Feuille) (Feuille)))
+
+--exemple peigne
 peigne = [('B',1),('N',2),('B',3)]
+
+--fonction maptree
 maptree :: (a -> b) -> Arbre c a -> Arbre c b
 maptree f (Feuille) 		= Feuille
 maptree f (Noeud c v (a1) (a2)) = Noeud c (f v) (maptree f a1) (maptree f a2)
@@ -52,10 +60,40 @@ peigneGauche ((c,a):as)	= Noeud c a (peigneGauche as) (Feuille)
 
 
 prop_hauteurPeigne xs 	= length xs == hauteur (peigneGauche xs)
-
+--version avec Recursion
 estComplet :: Arbre c a -> Bool
-estComplet (Feuille) = True
-estComplet a = if ((taille a `log` 2) == 0 )
-		then  True
-		else
-		 False
+estComplet (Feuille) 				= False
+estComplet (Noeud _ _ (Feuille) (Feuille))	= True
+estComplet (Noeud coul val (ag) (ad)) 		= if (taille ag == taille ad )
+						then  estComplet ag && estComplet ad
+						else
+						False
+
+--estComplet' :: Arbre c a -> Bool
+--estComplet' a = foldtree (fComplet) (Feuille) a
+
+--fComplet :: Arbre c v -> Arbre c v -> Bool
+--fComplet a b = (taille a == taille b)
+
+--Question 10
+
+fmyst :: a -> [a]
+fmyst a = a : fmyst a
+
+fmyst' :: a -> [a]
+fmyst' a = iterate (id) a
+--fonction qui zip d'un côté les parenthèses et de l'autre côté la liste des caractère de a à .. infini
+createCharList :: Char -> [((),Char)]
+createCharList a = zip (fmyst ()) ['a' ..]
+--Question 12
+aplatit :: Arbre c a -> [(c,a)]
+aplatit (Feuille) = []
+aplatit (Noeud c v (ag) (ad)) = [(c,v)] ++ aplatit (ag) ++ aplatit (ad)
+
+--testaplatit :: (Arbre c a -> [(c,a)]) -> Bool
+--testaplatit = return (map snd (aplatit acomplet2) == "abcdefghijklmno")
+
+--Question 13
+element :: Eq a => a -> Arbre c a -> Bool
+element a Feuille = False
+element a (Noeud c v (ag) (ad)) = (a == v) || (element a ag) || (element a ad)
