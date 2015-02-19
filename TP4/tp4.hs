@@ -74,7 +74,10 @@ estComplet (Noeud coul val (ag) (ad)) 		= if (taille ag == taille ad )
 
 --fComplet :: Arbre c v -> Arbre c v -> Bool
 --fComplet a b = (taille a == taille b)
-
+--Question 9 
+complet :: Int -> [(c,a)] -> Arbre c a
+complet 0 (c,a) = (Noeud c a (Feuille) (Feuille))
+complet n (c,a):rs = (Noeud
 --Question 10
 
 fmyst :: a -> [a]
