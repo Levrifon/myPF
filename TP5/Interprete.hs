@@ -32,7 +32,7 @@ applique [] = undefined
 applique [e] = e
 applique es = App (applique (init es)) (last es)
 
---Question 5
+--Question 5 (obsolete) 
 --exprP :: Parser Expression
 --exprP = varP
 
@@ -48,8 +48,27 @@ lambdaP = (car '\\' >>= \_ ->
           car '>' 	>>= \_ 	->
           espacesP 	>>= \_	->
           exprsP 	>>= \s 	-> return (Lam r s))
+          
+
+lambdaP' = do car '\\' 
+              espacesP      
+              r <- nomP
+              car '-'
+              car '>'
+              espacesP
+              s <- exprsP
+              return (Lam r s)
+          
 --Question 7
 exprP = varP ||| lambdaP
 
 --Question 8
+exprParentheseeP :: Parser Expression
+exprParentheseeP =	(	car '(' >>= \_	-> 
+				espacesP>>= \_	->
+				exprP 	>>= \r	->
+				car ')' >>= \_	->
+				return r
+			)
+		
 
