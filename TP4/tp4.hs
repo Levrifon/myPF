@@ -74,10 +74,14 @@ estComplet (Noeud coul val (ag) (ad)) 		= if (taille ag == taille ad )
 
 --fComplet :: Arbre c v -> Arbre c v -> Bool
 --fComplet a b = (taille a == taille b)
+
+-- Question 8 : les peignes a gauche complets sont les feuilles
+-- Pour verifier avec un Quicktest il faudrait comparer le nombre de feuilles == taille de tout les peignes
+
 --Question 9 
-complet :: Int -> [(c,a)] -> Arbre c a
-complet 0 (c,a) = (Noeud c a (Feuille) (Feuille))
-complet n (c,a):rs = (Noeud
+--complet :: Int -> [(c,a)] -> Arbre c a
+--complet 0 (c,a) = (Noeud c a (Feuille) (Feuille))
+--complet n ((c,a),(c2,a2),(c3,a3):rs) = (Noeud c2 a2 (Noeud c a) (Noeud c3 a3))
 --Question 10
 
 fmyst :: a -> [a]
@@ -100,3 +104,28 @@ aplatit (Noeud c v (ag) (ad)) = [(c,v)] ++ aplatit (ag) ++ aplatit (ad)
 element :: Eq a => a -> Arbre c a -> Bool
 element a Feuille = False
 element a (Noeud c v (ag) (ad)) = (a == v) || (element a ag) || (element a ad)
+
+--Question 14
+noeud :: (c -> String) -> (a -> String) -> (c,a) -> String
+noeud fcol fval (c,a) = fcol c ++ fval a 
+
+--Question 15
+arcs :: Arbre c a -> [(a,a)]
+arcs (Feuille) = []
+arcs (Noeud c v (Feuille) (Feuille)) = []
+-- ici il faut faire le couple (valeur, valeur de gauche) (valeur, valeur de droite) et appeller la suite
+arcs (Noeud c v (ag) (ad)) = (v,getValeur ag):(v,getValeur ad) : ((arcs ag) ++ (arcs ad))
+
+--fonction personelle pour simplifier la question précédente
+getValeur :: Arbre c a -> a
+getValeur (Noeud c v _ _) = v
+
+--Question 16
+arc :: (a -> String) -> (a,a) -> String
+arc f (a,b) = f a ++ " -> " ++ f b
+
+--Question 17
+dotise :: String -> (c -> String) -> (a -> String) -> Arbre c a -> String
+dotise name fcol fval (Feuille) = ""
+
+
