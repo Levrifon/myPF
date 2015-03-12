@@ -1,5 +1,5 @@
 import Parser
---Debue Rémy
+--Debue Rémy Groupe 3
 type Nom = String
 
 data Expression = Lam Nom Expression
@@ -26,10 +26,11 @@ nomP = (unOuPlus (carCond (flip elem ['a'..'z']))) >>= \r ->
 varP :: Parser Expression
 varP = nomP >>= \r -> return (Var r)
 
---Question 4
+--Question 4 je distingue ici les différents cas (1 / 2 / n expreessions)
 applique :: [Expression] -> Expression
 applique [] = undefined
-applique [e] = e
+applique (e:[]) = e
+applique (e:e2:[]) = App e e2
 applique es = App (applique (init es)) (last es)
 
 --Question 5 (obsolete) 
@@ -39,7 +40,7 @@ applique es = App (applique (init es)) (last es)
 exprsP :: Parser Expression
 exprsP = (unOuPlus exprP) >>= \r -> return (applique r)
 
---Question 6
+--Question 6 ici on verifie si il y a bien le caractere 'fleche' précédés/suivis d'eventuels espaces
 lambdaP :: Parser Expression
 lambdaP = (car '\\' >>= \_ ->
           espacesP      >>= \_ 	->
@@ -60,15 +61,49 @@ lambdaP' = do car '\\'
               return (Lam r s)
           
 --Question 7
-exprP = varP ||| lambdaP
 
---Question 8
+--Question 8 coresspond a une parenthese ouvrante suivie d'une expression avec espaces après ou non puis la parenthèse fermante
 exprParentheseeP :: Parser Expression
 exprParentheseeP =	(	car '(' >>= \_	-> 
+				exprsP 	>>= \r	->
 				espacesP>>= \_	->
-				exprP 	>>= \r	->
 				car ')' >>= \_	->
 				return r
 			)
 		
+--exprP = (varP ||| lambdaP ||| exprParentheseeP) >>= \r -> espacesP >>= \_ -> return r
 
+nombreP :: Parser Expression
+nombreP = (unOuPlus (carCond (flip elem ['0'..'9'])))	>>= \r -> espacesP >>= \_ -> return (Lit (Entier (read r)))
+-- Pour booleen je n'ai pas trouvé d'autres solutions que créer deux fonctions intermédiaires, Alexandre MOEVI m'a aidé pour cette question
+booleenP :: Parser Expression
+booleenP = (isTrue ||| isFalse)
+
+isTrue ::  Parser Expression
+isTrue	= (chaine "True" >>= \_ 	-> return (Lit (Bool (True))))
+
+isFalse :: Parser Expression
+isFalse = (chaine "False" >>= \_	-> return (Lit (Bool (False))))
+--Question 10 on étend simplement comme précédemment
+exprP = (varP ||| lambdaP ||| exprParentheseeP ||| nombreP ||| booleenP) >>= \r -> espacesP >>= \_ -> return r
+
+expressionP :: Parser Expression
+expressionP = espacesP >>= \_ -> exprsP
+--Question 12
+ras :: String -> Expression
+ras ch = let res = parse expressionP ch in
+	if (complet res) 
+	then resultat res 
+	else error "Erreur d’analyse syntaxique"
+--Question 13	
+data ValeurA = VLitteralA Litteral
+	     | VFonctionA (ValeurA -> ValeurA) 
+--Le probleme est que on ne peut pas afficher la valeur car sa definition est "récursive"
+--Question 14
+
+instance Show ValeurA where
+    show (VFonctionA _) = "λ"
+                       -- ^ ou "VFonctionA _", ou "<fun>" ou toute
+                       --   autre représentation des fonctions
+    show (VLitteralA  a) = show resultat a
+   
