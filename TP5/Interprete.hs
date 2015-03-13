@@ -102,8 +102,12 @@ data ValeurA = VLitteralA Litteral
 --Question 14
 
 instance Show ValeurA where
-    show (VFonctionA _) = "λ"
+    show (VFonctionA _) 		= "λ"
                        -- ^ ou "VFonctionA _", ou "<fun>" ou toute
                        --   autre représentation des fonctions
-    show (VLitteralA  a) = show resultat a
+                       -- ici précédemment je faisais show VLitteralA a = show a mais cela affichait aussi le type, je l'ai donc remplacé par show VLitteralA (Type a)
+    show (VLitteralA  (Bool a)) 	= show a
+    show (VLitteralA  (Entier a)) 	= show a
+    
+type Environnement a = [(Nom, a)]
    
