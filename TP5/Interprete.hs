@@ -1,4 +1,5 @@
 import Parser
+import Data.Maybe (fromJust)
 --Debue Rémy Groupe 3
 type Nom = String
 
@@ -110,4 +111,31 @@ instance Show ValeurA where
     show (VLitteralA  (Entier a)) 	= show a
     
 type Environnement a = [(Nom, a)]
-   
+
+--Question 15
+interpreteA :: Environnement ValeurA -> Expression -> ValeurA
+-- l'environnement contient en clé les noms, en valeur les ValeurA
+interpreteA _ 	(Lit l) 	= VLitteralA l
+interpreteA env (Var v)		= fromJust (lookup v env)
+interpreteA env (Lam n e) 	= VFonctionA( \v -> interpreteA ((n,v):env) e)
+-- on transforme l'interpretation de e en VFonctionA f --> donc f = (interpreteA env e)
+-- et on applique cette fonction a e'
+interpreteA env (App e e') 	= 	let VFonctionA fct = (interpreteA env e) 
+					in fct(interpreteA env e')
+--Question 16				
+negA :: ValeurA
+negA = VFonctionA (\(VLitteralA (Entier a)) -> (VLitteralA (Entier (-a))))
+
+--Question 17
+addA :: ValeurA
+addA = VFonctionA (\(VLitteralA (Entier a)) -> VFonctionA (\(VLitteralA (Entier b)) -> (VLitteralA (Entier (a+b)))))
+
+envA:: Environnement ValeurA
+envA = [ ("neg",   negA)
+       , ("add",   releveBinOpEntierA (+))
+       , ("soust", releveBinOpEntierA (-))
+       , ("mult",  releveBinOpEntierA (*))
+       , ("quot",  releveBinOpEntierA quot) ]
+
+--Question 18
+releveBinOpEntierA :: (Integer -> Integer -> Integer) -> ValeurA
