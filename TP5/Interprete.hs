@@ -15,7 +15,7 @@ data Litteral = Entier Integer
 
 --Question 1 on detecte 0 ou n espaces si c'est le cas on continue sinon on retourne directement l'etat actuel
 espacesP :: Parser ()
-espacesP = (zeroOuPlus (car ' ') >>= \_ -> return ()) ||| (return ())
+espacesP = (zeroOuPlus (car ' ') >>= \_ -> return ()) 
 
 --Question 2 on verifie si il y a un ou n caractères de l'alphabet on enlève ensuite les espaces et on retourne ce resultat
 nomP :: Parser Nom
@@ -131,11 +131,16 @@ addA :: ValeurA
 addA = VFonctionA (\(VLitteralA (Entier a)) -> VFonctionA (\(VLitteralA (Entier b)) -> (VLitteralA (Entier (a+b)))))
 
 envA:: Environnement ValeurA
-envA = [ ("neg",   negA)
-       , ("add",   releveBinOpEntierA (+))
-       , ("soust", releveBinOpEntierA (-))
-       , ("mult",  releveBinOpEntierA (*))
-       , ("quot",  releveBinOpEntierA quot) ]
+envA = [ ("neg",	negA)
+       , ("add",	releveBinOpEntierA (+))
+       , ("soust",	releveBinOpEntierA (-))
+       , ("mult",	releveBinOpEntierA (*))
+       , ("quot",	releveBinOpEntierA quot)
+	,("if",		ifthenelseA)]
 
 --Question 18
 releveBinOpEntierA :: (Integer -> Integer -> Integer) -> ValeurA
+releveBinOpEntierA op = VFonctionA (\(VLitteralA (Entier a)) -> VFonctionA (\(VLitteralA (Entier b)) -> (VLitteralA (Entier (op a b)))))
+--Question 19
+ifthenelseA :: ValeurA
+ifthenelseA = VFonctionA(\(VLitteralA (Bool a)) -> VFonctionA (\b -> VFonctionA(\c -> if a then b else c)))
